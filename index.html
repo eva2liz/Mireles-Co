@@ -270,7 +270,7 @@
         <button class="btn btn-gold" type="submit">Send message</button>
         <p id="form-status" class="status" role="status"></p>
       </form>
-      <span class="email">Prefer email? <a href="mailto:eva@mirelesco.com">eva@mirelesco.com</a></span>
+      <span class="email">Prefer email? <a href="mailto:info@mirelesco.com">info@mirelesco.com</a></span>
     </div>
   </section>
 
@@ -302,11 +302,11 @@
           const data = await res.json().catch(() => ({}));
           const msg = (data.errors || []).map(e => e.message).join(' ');
           status.className = 'status err';
-          status.textContent = msg || 'Sorry, something went wrong. Please email eva@mirelesco.com instead.';
+          status.textContent = msg || 'Sorry, something went wrong. Please email info@mirelesco.com instead.';
         }
       } catch {
         status.className = 'status err';
-        status.textContent = 'Sorry, something went wrong. Please email eva@mirelesco.com instead.';
+        status.textContent = 'Sorry, something went wrong. Please email info@mirelesco.com instead.';
       }
       btn.disabled = false; btn.textContent = 'Send message';
     });
