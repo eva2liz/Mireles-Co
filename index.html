@@ -100,6 +100,26 @@
     .contact .email { display: block; margin-top: 18px; color: var(--muted); }
     .contact .email a { color: var(--teal); font-weight: 600; text-decoration: none; }
 
+    .form { max-width: 680px; margin: 0 auto; text-align: left; display: grid; gap: 18px;
+      background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 32px;
+      box-shadow: 0 12px 30px rgba(11,37,69,.06); }
+    .form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form label { display: grid; gap: 6px; font-weight: 600; font-size: .9rem; color: var(--navy); }
+    .form .opt { font-weight: 400; color: var(--muted); }
+    .form input, .form select, .form textarea { font: inherit; font-weight: 400; color: var(--ink);
+      border: 1px solid #cfd7e2; border-radius: 6px; padding: 12px 14px; background: #fff; width: 100%; }
+    .form input:focus, .form select:focus, .form textarea:focus { outline: none; border-color: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-soft); }
+    .form button { justify-self: start; border: 0; cursor: pointer; font-family: inherit; }
+    .form button:disabled { opacity: .6; cursor: wait; }
+    .hp { position: absolute; left: -9999px; }
+    .status { font-weight: 600; }
+    .status:empty { display: none; }
+    section { scroll-margin-top: 76px; }
+    .status.ok { color: var(--teal); }
+    .status.err { color: #b3261e; }
+    @media (max-width: 600px) { .form .row { grid-template-columns: 1fr; } .form { padding: 22px; } }
+
     footer { border-top: 1px solid var(--line); padding: 32px 0; }
     footer .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
     footer img { height: 40px; width: auto; }
@@ -227,7 +247,30 @@
         <h2>Let's build your business blueprint</h2>
         <p>Tell us what you're working on. We'll get back to you within one business day.</p>
       </div>
-      <a class="btn btn-gold" href="mailto:info@mirelesco.com">Email info@mirelesco.com</a>
+      <form id="contact-form" class="form" action="https://formspree.io/f/xqpadwlp" method="POST">
+        <div class="row">
+          <label>Name<input type="text" name="name" required autocomplete="name"></label>
+          <label>Email<input type="email" name="email" required autocomplete="email"></label>
+        </div>
+        <div class="row">
+          <label><span>Company <span class="opt">(optional)</span></span><input type="text" name="company" autocomplete="organization"></label>
+          <label>I'm interested in
+            <select name="service">
+              <option>Website or app</option>
+              <option>Automation (Python)</option>
+              <option>Power BI &amp; data</option>
+              <option>Accounting</option>
+              <option>Not sure yet</option>
+            </select>
+          </label>
+        </div>
+        <label>How can we help?<textarea name="message" rows="5" required></textarea></label>
+        <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off">
+        <input type="hidden" name="_subject" value="New inquiry from mirelesco.com">
+        <button class="btn btn-gold" type="submit">Send message</button>
+        <p id="form-status" class="status" role="status"></p>
+      </form>
+      <span class="email">Prefer email? <a href="mailto:eva@mirelesco.com">eva@mirelesco.com</a></span>
     </div>
   </section>
 
@@ -237,6 +280,37 @@
       <small>© 2026 Mireles &amp; Co. All rights reserved.</small>
     </div>
   </footer>
+
+  <script>
+    // Sends the form in the background so visitors stay on the page
+    const form = document.getElementById('contact-form');
+    const status = document.getElementById('form-status');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button');
+      btn.disabled = true; btn.textContent = 'Sending…';
+      status.className = 'status'; status.textContent = '';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+          form.reset();
+          status.className = 'status ok';
+          status.textContent = "Thanks! Your message was sent. We'll be in touch within one business day.";
+        } else {
+          const data = await res.json().catch(() => ({}));
+          const msg = (data.errors || []).map(e => e.message).join(' ');
+          status.className = 'status err';
+          status.textContent = msg || 'Sorry, something went wrong. Please email eva@mirelesco.com instead.';
+        }
+      } catch {
+        status.className = 'status err';
+        status.textContent = 'Sorry, something went wrong. Please email eva@mirelesco.com instead.';
+      }
+      btn.disabled = false; btn.textContent = 'Send message';
+    });
+  </script>
 
 </body>
 </html>
